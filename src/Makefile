@@ -6,8 +6,8 @@
 # Your platform. See PLATS for possible values.
 PLAT= guess
 
-CC= gcc -std=gnu99
-CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
+CC= gcc -std=gnu99 -ggdb
+CFLAGS= -O2 -Wall -ggdb -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
@@ -26,7 +26,7 @@ MYLIBS=
 MYOBJS=
 
 # Special flags for compiler modules; -Os reduces code size.
-CMCFLAGS= 
+CMCFLAGS=
 
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
@@ -131,10 +131,16 @@ linux-readline:
 Darwin macos macosx:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX -DLUA_USE_READLINE" SYSLIBS="-lreadline"
 
-mingw:
+mingwold:
 	$(MAKE) "LUA_A=lua54.dll" "LUA_T=lua.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
 	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
+	$(MAKE) "LUAC_T=luac.exe" luac.exe
+
+mingw:
+	$(MAKE) "LUA_A=lua54.dll" "LUA_T=lua.exe" \
+	"AR=$(CC) -shared -o" "RANLIB= " \
+	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS= " lua.exe
 	$(MAKE) "LUAC_T=luac.exe" luac.exe
 
 posix:
