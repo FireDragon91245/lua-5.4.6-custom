@@ -824,15 +824,6 @@ void luaH_finishset (lua_State *L, Table *t, const TValue *key,
 void luaH_set (lua_State *L, Table *t, const TValue *key, TValue *value) {
   const TValue *slot = luaH_get(t, key);
   luaH_finishset(L, t, key, slot, value);
-
-    const TValue *p = luaH_get(t, key);
-    if (!ttisnil(p)) {
-        /* If key exists, check for __override metamethod */
-        TValue *mt = fasttm(L, t->metatable, TM_OVERRIDE);
-        if (mt && ttisfunction(mt)) {
-            luaT_callTM(L, mt, t, key, p, s2v(key)); /* Call __override with (table, key, old value, new value) */
-        }
-    }
 }
 
 
