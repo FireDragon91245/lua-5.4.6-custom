@@ -82,6 +82,8 @@ LUAI_FUNC void luaT_init (lua_State *L);
 
 LUAI_FUNC void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
                             const TValue *p2, const TValue *p3);
+LUAI_FUNC void luaT_callTMex (lua_State *L, const TValue *f, const TValue *p1,
+                            const TValue *p2, const TValue *p3, const TValue *p4);
 LUAI_FUNC void luaT_callTMres (lua_State *L, const TValue *f,
                             const TValue *p1, const TValue *p2, StkId p3);
 LUAI_FUNC void luaT_trybinTM (lua_State *L, const TValue *p1, const TValue *p2,

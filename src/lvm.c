@@ -319,6 +319,29 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
   luaG_runerror(L, "'__index' chain too long; possible loop");
 }
 
+/*
+ *
+ */
+
+int luaV_finishoverridetm(lua_State *L, const TValue *t, TValue *key, TValue *val, const TValue *slot)
+{
+    Table *h = hvalue(t);
+    const TValue *tm = fasttm(L, h->metatable, TM_OVERRIDE);
+    if (tm == NULL)
+        return 0;
+
+    if (ttisfunction(tm))
+    {
+        luaT_callTMex(L, tm, t, key, val, slot);
+        return 1;
+    }
+    else
+    {
+        luaG_typeerror(L, t, "override");
+        return 0;
+    }
+}
+
 
 /*
 ** Finish a table assignment 't[key] = val'.
@@ -356,7 +379,13 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
     }
     t = tm;  /* else repeat assignment over 'tm' */
     if (luaV_fastget(L, t, key, slot, luaH_get)) {
-      luaV_finishfastset(L, t, slot, val);
+#ifndef CUSTOM_OVERRIDE_DISABLE4
+        if(!luaV_finishoverridetm(L, t, key, val, slot)) {
+#endif
+            luaV_finishfastset(L, t, slot, val);
+#ifndef CUSTOM_OVERRIDE_DISABLE4
+        }
+#endif
       return;  /* done */
     }
     /* else 'return luaV_finishset(L, t, key, val, slot)' (loop) */
@@ -1311,7 +1340,13 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb);  /* key must be a string */
         if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
-          luaV_finishfastset(L, upval, slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE5
+            if(!luaV_finishoverridetm(L, upval, rb, rc, slot)) {
+#endif
+                luaV_finishfastset(L, upval, slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE5
+            }
+#endif
         }
         else
           Protect(luaV_finishset(L, upval, rb, rc, slot));
@@ -1326,7 +1361,13 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         if (ttisinteger(rb)  /* fast track for integers? */
             ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))
             : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {
-          luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE6
+            if(!luaV_finishoverridetm(L, s2v(ra), rb, rc, slot)) {
+#endif
+                luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE6
+            }
+#endif
         }
         else
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
@@ -1338,7 +1379,15 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         int c = GETARG_B(i);
         TValue *rc = RKC(i);
         if (luaV_fastgeti(L, s2v(ra), c, slot)) {
-          luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE7
+            TValue key;
+            setivalue(&key, c);
+            if(!luaV_finishoverridetm(L, s2v(ra), &key, rc, slot)) {
+#endif
+                luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE7
+            }
+#endif
         }
         else {
           TValue key;
@@ -1354,8 +1403,19 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb);  /* key must be a string */
         if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {
-          luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE8
+            TValue val_key;
+            setsvalue(L, &val_key, key);
+            // ra = table, rb = key, rc = new value, slot = old value
+            if(!luaV_finishoverridetm(L, s2v(ra), &val_key, rc, slot))
+            {
+#endif
+                luaV_finishfastset(L, s2v(ra), slot, rc);
+            }
+          //luaV_finishfastset(L, s2v(ra), slot, rc);
+#ifndef CUSTOM_OVERRIDE_DISABLE8
         }
+#endif
         else
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
         vmbreak;

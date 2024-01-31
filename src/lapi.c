@@ -831,7 +831,15 @@ static void auxsetstr (lua_State *L, const TValue *t, const char *k) {
   TString *str = luaS_new(L, k);
   api_checknelems(L, 1);
   if (luaV_fastget(L, t, str, slot, luaH_getstr)) {
-    luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE1
+      TValue key;
+      setsvalue(L, &key, str);
+      if(!luaV_finishoverridetm(L, t, &key, s2v(L->top.p - 1), slot)) {
+#endif
+          luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE1
+      }
+#endif
     L->top.p--;  /* pop value */
   }
   else {
@@ -859,7 +867,13 @@ LUA_API void lua_settable (lua_State *L, int idx) {
   api_checknelems(L, 2);
   t = index2value(L, idx);
   if (luaV_fastget(L, t, s2v(L->top.p - 2), slot, luaH_get)) {
-    luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE2
+      if(!luaV_finishoverridetm(L, t, s2v(L->top.p - 2), s2v(L->top.p - 1), slot)) {
+#endif
+          luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE2
+      }
+#endif
   }
   else
     luaV_finishset(L, t, s2v(L->top.p - 2), s2v(L->top.p - 1), slot);
@@ -881,7 +895,15 @@ LUA_API void lua_seti (lua_State *L, int idx, lua_Integer n) {
   api_checknelems(L, 1);
   t = index2value(L, idx);
   if (luaV_fastgeti(L, t, n, slot)) {
-    luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE3
+      TValue key;
+      setivalue(&key, n);
+      if(!luaV_finishoverridetm(L, t, &key, s2v(L->top.p - 1), slot)) {
+#endif
+          luaV_finishfastset(L, t, slot, s2v(L->top.p - 1));
+#ifndef CUSTOM_OVERRIDE_DISABLE3
+      }
+#endif
   }
   else {
     TValue aux;
