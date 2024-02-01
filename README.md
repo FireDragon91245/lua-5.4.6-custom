@@ -1,11 +1,12 @@
 # This is a modified version of the lua Interpreter
-Original Version Lua 5.4.6 from (here)[https://www.lua.org/]
-(Download Page)[https://www.lua.org/download.html]
-(Direct Download)[https://www.lua.org/ftp/lua-5.4.6.tar.gz]
+Original Version Lua 5.4.6 from [here](https://www.lua.org/)
+[Download Page](https://www.lua.org/download.html)
+[Direct Download](https://www.lua.org/ftp/lua-5.4.6.tar.gz)
 
 ## Modifications
 - Added '__override' metamethod that is called when a existing key in a table is asigned a new value
--> If __override exists gets called and the default asignment is cancled
+- -> If __override exists gets called and the default asignment is cancled
+
 Example:
 ```lua
 local t = {}
@@ -19,12 +20,11 @@ t.a = 1
 print("a value", t.a)
 t.a = 2 -- __override gets called default asignment is cancled
 print("a value", t.a)
-```
 
-stdout:
-a value 1
-override a 2 1
-a value 1
+-- stdout:
+-- a value 1
+-- override a 2 1
+-- a value 1
 ```
 
 # Original README
