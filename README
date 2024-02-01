@@ -1,7 +1,7 @@
 # This is a modified version of the lua Interpreter
-Original Version Lua 5.4.6 from [here](https://www.lua.org/)
-[Download Page](https://www.lua.org/download.html)
-[Direct Download](https://www.lua.org/ftp/lua-5.4.6.tar.gz)
+Original Version Lua 5.4.6 from (here)[https://www.lua.org/]
+(Download Page)[https://www.lua.org/download.html]
+(Direct Download)[https://www.lua.org/ftp/lua-5.4.6.tar.gz]
 
 ## Modifications
 - Added '__override' metamethod that is called when a existing key in a table is asigned a new value
