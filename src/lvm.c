@@ -1341,7 +1341,9 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TString *key = tsvalue(rb);  /* key must be a string */
         if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
 #ifndef CUSTOM_OVERRIDE_DISABLE5
-            if(!luaV_finishoverridetm(L, upval, rb, rc, slot)) {
+            int tmp_res;
+            Protect(tmp_res = luaV_finishoverridetm(L, upval, rb, rc, slot));
+            if(!tmp_res) {
 #endif
                 luaV_finishfastset(L, upval, slot, rc);
 #ifndef CUSTOM_OVERRIDE_DISABLE5
@@ -1362,7 +1364,9 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
             ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))
             : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {
 #ifndef CUSTOM_OVERRIDE_DISABLE6
-            if(!luaV_finishoverridetm(L, s2v(ra), rb, rc, slot)) {
+            int tmp_res;
+            Protect(tmp_res = luaV_finishoverridetm(L, s2v(ra), rb, rc, slot));
+            if(!tmp_res) {
 #endif
                 luaV_finishfastset(L, s2v(ra), slot, rc);
 #ifndef CUSTOM_OVERRIDE_DISABLE6
@@ -1382,7 +1386,9 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
 #ifndef CUSTOM_OVERRIDE_DISABLE7
             TValue key;
             setivalue(&key, c);
-            if(!luaV_finishoverridetm(L, s2v(ra), &key, rc, slot)) {
+            int tmp_res;
+            Protect(tmp_res = luaV_finishoverridetm(L, s2v(ra), &key, rc, slot));
+            if(!tmp_res) {
 #endif
                 luaV_finishfastset(L, s2v(ra), slot, rc);
 #ifndef CUSTOM_OVERRIDE_DISABLE7
@@ -1407,7 +1413,9 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
             TValue val_key;
             setsvalue(L, &val_key, key);
             // ra = table, rb = key, rc = new value, slot = old value
-            if(!luaV_finishoverridetm(L, s2v(ra), &val_key, rc, slot))
+            int tmp_res;
+            Protect(tmp_res = luaV_finishoverridetm(L, s2v(ra), &val_key, rc, slot));
+            if(!tmp_res)
             {
 #endif
                 luaV_finishfastset(L, s2v(ra), slot, rc);
