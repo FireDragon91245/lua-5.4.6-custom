@@ -43,7 +43,8 @@ void luaT_init (lua_State *L) {
     "__div", "__idiv",
     "__band", "__bor", "__bxor", "__shl", "__shr",
     "__unm", "__bnot", "__lt", "__le",
-    "__concat", "__call", "__close", "__override"
+    "__concat", "__call", "__close", "__override",
+    "__eindex"
   };
   int i;
   for (i=0; i<TM_N; i++) {

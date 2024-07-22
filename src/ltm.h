@@ -43,6 +43,7 @@ typedef enum {
   TM_CALL,
   TM_CLOSE,
   TM_OVERRIDE,
+  TM_EINDEX,
   TM_N		/* number of elements in the enum */
 } TMS;
 

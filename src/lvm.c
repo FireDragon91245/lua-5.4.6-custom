@@ -323,6 +323,25 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
  *
  */
 
+int luaV_finisheindextm(lua_State *L, const TValue *t, TValue *key, StkId ra)
+{
+    Table *h = hvalue(t);
+    const TValue  *tm = fasttm(L, h->metatable, TM_EINDEX);
+    if (tm == NULL)
+        return 0;
+
+    if(ttisfunction(tm))
+    {
+        luaT_callTMres(L, tm, t, key, ra);
+        return 1;
+    }
+    else
+    {
+        luaG_typeerror(L, t, "eindex");
+        return 0;
+    }
+}
+
 int luaV_finishoverridetm(lua_State *L, const TValue *t, TValue *key, TValue *val, const TValue *slot)
 {
     Table *h = hvalue(t);
@@ -1311,7 +1330,14 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rb = vRB(i);
         int c = GETARG_C(i);
         if (luaV_fastgeti(L, rb, c, slot)) {
-          setobj2s(L, ra, slot);
+            TValue key;
+            setivalue(&key, c);
+            int tmp_res;
+            Protect(tmp_res = luaV_finisheindextm(L, rb, &key, ra));
+            if(!tmp_res)
+            {
+                setobj2s(L, ra, slot);
+            }
         }
         else {
           TValue key;
@@ -1327,7 +1353,13 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rc = KC(i);
         TString *key = tsvalue(rc);  /* key must be a string */
         if (luaV_fastget(L, rb, key, slot, luaH_getshortstr)) {
-          setobj2s(L, ra, slot);
+            int tmp_res;
+            TValue keyv;
+            setsvalue(L, &keyv, key);
+            Protect(tmp_res = luaV_finisheindextm(L, rb, &keyv, ra));
+            if(!tmp_res) {
+                setobj2s(L, ra, slot);
+            }
         }
         else
           Protect(luaV_finishget(L, rb, rc, ra, slot));
